@@ -24,19 +24,31 @@ kotlin {
                 implementation("io.github.aakira:napier:${Versions.napier}")
             }
         }
+        val engineMain by creating {
+            dependsOn(commonMain)
+        }
+        val jniMain by creating {
+            dependsOn(engineMain)
+        }
         val androidMain by getting {
+            dependsOn(jniMain)
             dependencies {
                 implementation("io.ktor:ktor-client-okhttp:${Versions.ktor}")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.Kotlin.coroutines}")
             }
         }
-        val desktopMain by sourceSets.getting {
+        val desktopMain by getting {
+            dependsOn(jniMain)
             dependencies {
                 implementation("io.ktor:ktor-client-okhttp:${Versions.ktor}")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:${Versions.Kotlin.coroutines}")
             }
         }
-        val iosMain by sourceSets.getting {
+        val nativeMain by creating {
+            dependsOn(engineMain)
+        }
+        val iosMain by getting {
+            dependsOn(nativeMain)
             dependencies {
                 implementation("io.ktor:ktor-client-darwin:${Versions.ktor}")
             }
@@ -56,4 +68,25 @@ android {
         sourceCompatibility = Versions.Java.java
         targetCompatibility = Versions.Java.java
     }
+}
+
+val cargoBuild by tasks.registering {
+    doLast {
+        exec {
+            workingDir = File(project.projectDir, "rs")
+            commandLine = listOf(
+                "cargo", "xdk",
+                "-t", "x86",
+                "-o", "../src/androidMain/jniLibs",
+                "build", "--release",
+            )
+        }
+    }
+}
+
+afterEvaluate {
+    val javaPreCompileDebug by tasks.getting
+    javaPreCompileDebug.dependsOn(cargoBuild)
+    val javaPreCompileRelease by tasks.getting
+    javaPreCompileRelease.dependsOn(cargoBuild)
 }

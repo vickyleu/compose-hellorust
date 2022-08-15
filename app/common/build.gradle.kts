@@ -17,6 +17,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                api(projects.vlc)
                 api(compose.ui)
                 api(compose.foundation)
                 api(compose.material)
