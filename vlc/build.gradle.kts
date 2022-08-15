@@ -63,6 +63,9 @@ android {
     defaultConfig {
         minSdk = Versions.Android.min
         targetSdk = Versions.Android.target
+        ndk {
+            abiFilters += listOf("x86", "x86_64", "armeabi-v7a", "arm64-v8a")
+        }
     }
     compileOptions {
         sourceCompatibility = Versions.Java.java
