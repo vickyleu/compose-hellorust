@@ -7,7 +7,7 @@ kotlin {
     ios("uikit") {
         binaries {
             executable {
-                entryPoint = "com.seiko.compose.vlc.demo.main"
+                entryPoint = "com.seiko.compose.hellorust.demo.main"
                 freeCompilerArgs = freeCompilerArgs + listOf(
                     "-linker-option", "-framework", "-linker-option", "Metal",
                 )
@@ -25,7 +25,7 @@ kotlin {
 
 compose.experimental {
     uikit.application {
-        bundleIdPrefix = "com.seiko.compose.vlc.demo"
+        bundleIdPrefix = "com.seiko.compose.hellorust.demo"
         projectName = "Compose Vlc"
     }
 }

@@ -17,7 +17,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(projects.vlc)
+                api(projects.helloRust)
                 api(compose.ui)
                 api(compose.foundation)
                 api(compose.material)
@@ -33,7 +33,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.seiko.compose.vlc.demo"
+    namespace = "com.seiko.compose.hellorust.demo"
     compileSdk = Versions.Android.compile
     buildToolsVersion = Versions.Android.buildTools
     defaultConfig {

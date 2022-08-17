@@ -11,8 +11,6 @@ allprojects {
         kotlinOptions {
             jvmTarget = Versions.Java.jvmTarget
             freeCompilerArgs = freeCompilerArgs + listOf(
-                "-Xcontext-receivers",
-                "-Xskip-prerelease-check",
             )
         }
     }

@@ -26,7 +26,7 @@ kotlin {
 
 compose.desktop {
     application {
-        mainClass = "com.seiko.compose.vlc.demo.MainKt"
+        mainClass = "com.seiko.compose.hellorust.demo.MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "Compose Vlc"

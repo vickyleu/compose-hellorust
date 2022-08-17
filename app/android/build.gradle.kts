@@ -8,7 +8,7 @@ android {
     compileSdk = Versions.Android.compile
     buildToolsVersion = Versions.Android.buildTools
     defaultConfig {
-        applicationId = "com.seiko.compose.vlc.demo"
+        applicationId = "com.seiko.compose.hellorust.demo"
         minSdk = Versions.Android.min
         targetSdk = Versions.Android.target
         versionCode = 1

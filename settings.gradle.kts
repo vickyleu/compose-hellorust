@@ -17,13 +17,14 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "compose-vlc"
-include(":vlc")
+rootProject.name = "compose-hello-rust"
 include(
     ":app:common",
     ":app:android",
     ":app:desktop",
     ":app:ios",
 )
+include(":hello-rust")
+includeBuild("hello-rust-action")
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
