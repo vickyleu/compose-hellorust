@@ -15,6 +15,8 @@ kotlin {
         }
     }
     ios()
+    macosX64()
+    macosArm64()
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -54,6 +56,15 @@ kotlin {
                 implementation("io.ktor:ktor-client-darwin:${Versions.ktor}")
             }
         }
+        val macosMain by creating {
+            dependsOn(nativeMain)
+        }
+        val macosX64Main by getting {
+            dependsOn(macosMain)
+        }
+        val macosArm64Main by getting {
+            dependsOn(macosMain)
+        }
     }
 }
 
@@ -74,23 +85,10 @@ android {
     }
 }
 
-val cargoBuild by tasks.registering {
-    doLast {
-        exec {
-            workingDir = File(project.projectDir, "rs")
-            commandLine = listOf(
-                "cargo", "xdk",
-                "-t", "x86",
-                "-o", "../src/androidMain/jniLibs",
-                "build", "--release",
-            )
-        }
-    }
-}
+cargo {
+    module = "./rs"
+    libName = "hellorust"
+    profile = "release"
 
-afterEvaluate {
-    val javaPreCompileDebug by tasks.getting
-    javaPreCompileDebug.dependsOn(cargoBuild)
-    val javaPreCompileRelease by tasks.getting
-    javaPreCompileRelease.dependsOn(cargoBuild)
+    jvmJniDir = "./src/desktopMain/resources/jni"
 }

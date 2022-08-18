@@ -1,4 +1,10 @@
 package com.seiko.transform.action.rust
 
-class Toolchain {
+enum class ToolchainType {
+    Android, IOS, Jvm, Darwin;
 }
+
+data class Toolchain(
+    val type: ToolchainType,
+    val targets: Set<String>,
+)

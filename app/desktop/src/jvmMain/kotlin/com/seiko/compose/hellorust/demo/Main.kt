@@ -1,4 +1,4 @@
-package com.seiko.compose.hellorust
+package com.seiko.compose.hellorust.demo
 
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application

@@ -11,8 +11,8 @@ internal actual fun loadNativeLibrary() {
     val osName = System.getProperty("os.name").lowercase(Locale.US)
     val osArch = System.getProperty("os.arch").lowercase(Locale.US)
     val nativeLibraryJarPath = when {
-        osName.contains("linux") -> "/jni/$osArch/libhellorust.so"
-        osName.contains("mac") -> "/jni/$osArch/libhellorust.dylib"
+        osName.contains("linux") -> "/jni/${osArch}/libhellorust.so"
+        osName.contains("mac") -> "/jni/${osArch}/libhellorust.dylib"
         else -> throw IllegalStateException("Unsupported OS: $osName")
     }
 
