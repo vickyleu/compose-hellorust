@@ -1,20 +1,13 @@
-package com.seiko.compose.hellorust
+package com.seiko.compose.hellorust.demo
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Application
-import com.seiko.compose.ImageLoader
-import com.seiko.compose.ImageLoaderBuilder
-import com.seiko.compose.LocalImageLoader
-import com.seiko.compose.cache.memory.MemoryCacheBuilder
-import com.seiko.compose.hellorust.demo.App
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
-import kotlinx.cinterop.ObjCObjectBase
 import kotlinx.cinterop.autoreleasepool
 import kotlinx.cinterop.cstr
 import kotlinx.cinterop.memScoped
@@ -45,7 +38,7 @@ fun main() {
 class SkikoAppDelegate : UIResponder, UIApplicationDelegateProtocol {
     companion object : UIResponderMeta(), UIApplicationDelegateProtocolMeta
 
-    @ObjCObjectBase.OverrideInit
+    @OverrideInit
     constructor() : super()
 
     private var _window: UIWindow? = null
@@ -58,37 +51,17 @@ class SkikoAppDelegate : UIResponder, UIApplicationDelegateProtocol {
         application: UIApplication,
         didFinishLaunchingWithOptions: Map<Any?, *>?,
     ): Boolean {
-        window = UIWindow(frame = UIScreen.mainScreen.bounds)
-        window!!.rootViewController = Application("Compose ImageLoader") {
-            Column {
-                // To skip upper part of screen.
-                Spacer(modifier = Modifier.height(30.dp))
-                CompositionLocalProvider(
-                    LocalImageLoader provides generateImageLoader(),
-                    LocalResLoader provides ResLoader(),
-                ) {
+        window = UIWindow(frame = UIScreen.mainScreen.bounds).apply {
+            rootViewController = Application("Compose HelloRust") {
+                Column {
+                    // To skip upper part of screen.
+                    Spacer(modifier = Modifier.height(30.dp))
                     App()
                 }
             }
+            makeKeyAndVisible()
         }
-        window!!.makeKeyAndVisible()
         return true
     }
 }
 
-private fun generateImageLoader(): ImageLoader {
-    return ImageLoaderBuilder()
-        .memoryCache {
-            MemoryCacheBuilder()
-                // Set the max size to 25% of the app's available memory.
-                .maxSizePercent(0.25)
-                .build()
-        }
-        // .diskCache {
-        //     DiskCacheBuilder()
-        //         .directory(getCacheDir().resolve("image_cache").toOkioPath())
-        //         .maxSizeBytes(512L * 1024 * 1024) // 512MB
-        //         .build()
-        // }
-        .build()
-}

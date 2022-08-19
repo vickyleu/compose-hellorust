@@ -36,7 +36,6 @@ class RustKotlinPlugin : Plugin<Project> {
 
         val toolchains = mutableSetOf<Toolchain>()
         kmpExtension.targets.forEach {
-            println(it.name)
             when (it.name) {
                 "android" -> {
                     val androidExtension = extensions.getByType(LibraryExtension::class.java)
@@ -58,12 +57,6 @@ class RustKotlinPlugin : Plugin<Project> {
                             type = ToolchainType.Jvm,
                             targets = setOf(
                                 getCurrentOsTargetTriple(),
-                                // "x86_64-apple-darwin",
-                                // "aarch64-apple-darwin",
-                                // "x86_64-pc-windows-msvc",
-                                // "aarch64-pc-windows-msvc",
-                                // "x86_64-unknown-linux-gnu",
-                                // "aarch64-unknown-linux-gnu",
                             ),
                         )
                     )
@@ -72,7 +65,14 @@ class RustKotlinPlugin : Plugin<Project> {
 
                 }
                 "macosX64", "macosArm64" -> {
-
+                    toolchains.add(
+                        Toolchain(
+                            type = ToolchainType.Darwin,
+                            targets = setOf(
+                                getCurrentOsTargetTriple(),
+                            ),
+                        )
+                    )
                 }
             }
         }
@@ -102,10 +102,17 @@ class RustKotlinPlugin : Plugin<Project> {
                     javaPreCompileRelease.dependsOn(targetBuildTask)
                 }
                 ToolchainType.Jvm -> {
+                    // TODO replace desktop name
                     val compileKotlinDesktop by tasks.getting
                     compileKotlinDesktop.dependsOn(targetBuildTask)
                 }
-                else -> Unit
+                ToolchainType.Darwin -> {
+                    val compileKotlinMacosX64 by tasks.getting
+                    compileKotlinMacosX64.dependsOn(targetBuildTask)
+                }
+                ToolchainType.IOS -> {
+
+                }
             }
             buildTask.dependsOn(targetBuildTask)
         }

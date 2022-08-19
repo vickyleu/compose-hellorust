@@ -33,7 +33,7 @@ fun App() {
             }
         ) { innerPadding ->
             Box(Modifier.padding(innerPadding).fillMaxSize(), Alignment.Center) {
-                Text(HelloRust.hello())
+                Text(HelloRust.hello() + ", add=${HelloRust.add(100, 50)}")
             }
         }
     }

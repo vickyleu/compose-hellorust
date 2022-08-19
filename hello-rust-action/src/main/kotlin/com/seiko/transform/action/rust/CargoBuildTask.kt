@@ -14,18 +14,19 @@ open class CargoBuildTask : DefaultTask() {
     @TaskAction
     fun build() = with(project) {
         val cargoExtension = extensions.getByType(CargoExtension::class.java)
-        val moduleDir = getDir(cargoExtension.module)
         when (toolchain.type) {
-            ToolchainType.Android -> generateAndroid(cargoExtension, moduleDir)
-            ToolchainType.Jvm -> generateJvm(cargoExtension, moduleDir)
+            ToolchainType.Android -> generateAndroid(cargoExtension)
+            ToolchainType.Jvm -> generateJvm(cargoExtension)
+            ToolchainType.Darwin -> generateDarwin(cargoExtension)
             else -> Unit
         }
     }
 
     private fun Project.generateAndroid(
         cargoExtension: CargoExtension,
-        moduleDir: File,
     ) {
+        val jniFileName = cargoExtension.libName + cargoExtension.jniSuffix
+        val moduleDir = File(getDir(cargoExtension.module), jniFileName)
         exec {
             standardOutput = System.out
             workingDir = moduleDir
@@ -46,8 +47,9 @@ open class CargoBuildTask : DefaultTask() {
 
     private fun Project.generateJvm(
         cargoExtension: CargoExtension,
-        moduleDir: File,
     ) {
+        val jniFileName = cargoExtension.libName + cargoExtension.jniSuffix
+        val moduleDir = File(getDir(cargoExtension.module), jniFileName)
         val targetBuildDir = File(moduleDir, "target")
         val targetIntoDir = getDir(cargoExtension.jvmJniDir)
 
@@ -65,13 +67,41 @@ open class CargoBuildTask : DefaultTask() {
             }
             copy {
                 from(File(targetBuildDir, "$target/${cargoExtension.profile}"))
-                into(File(targetIntoDir, target.split('-').first()).also { if (!it.exists()) it.mkdirs() })
-
+                into(File(targetIntoDir, target.split('-').first()))
                 val libName = cargoExtension.libName
                 include("lib${libName}.so")
                 include("lib${libName}.dylib")
                 include("${libName}.dll")
             }
+        }
+    }
+
+    private fun Project.generateDarwin(
+        cargoExtension: CargoExtension,
+    ) {
+        val nativeFileName = cargoExtension.libName + cargoExtension.nativeSuffix
+        val moduleDir = File(getDir(cargoExtension.module), nativeFileName)
+        val targetBuildDir = File(moduleDir, "target")
+        val targetIntoDir = getDir(cargoExtension.darwinDir)
+
+        val target = toolchain.targets.first()
+        val libName = cargoExtension.libName
+        exec {
+            workingDir = moduleDir
+            commandLine = mutableListOf<String>().apply {
+                add(cargoExtension.cargoCommand)
+                add("build")
+                add("--target")
+                add(target)
+                configCommonArgs(cargoExtension)
+            }
+        }
+        copy {
+            from(File(targetBuildDir, "$target/${cargoExtension.profile}"))
+            into(File(targetIntoDir, libName))
+            include("lib${libName}.so")
+            include("lib${libName}.dylib")
+            include("${libName}.dll")
         }
     }
 

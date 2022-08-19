@@ -1,0 +1,10 @@
+[package]
+name = "hellorust_core"
+version = "0.0.1"
+edition = "2021"
+
+#[lib]
+#name = "hellorust_core"
+#crate-type = ["cdylib"]
+
+[dependencies]

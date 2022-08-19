@@ -23,6 +23,7 @@ include(
     ":app:android",
     ":app:desktop",
     ":app:ios",
+    ":app:macos",
 )
 include(":hello-rust")
 includeBuild("hello-rust-action")

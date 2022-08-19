@@ -14,6 +14,8 @@ kotlin {
         }
     }
     ios()
+    macosX64()
+    macosArm64()
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -27,8 +29,17 @@ kotlin {
             }
         }
         val androidMain by getting
-        val desktopMain by sourceSets.getting
-        val iosMain by sourceSets.getting
+        val desktopMain by getting
+        val iosMain by getting
+        val macosMain by creating {
+            dependsOn(commonMain)
+        }
+        val macosX64Main by getting {
+            dependsOn(macosMain)
+        }
+        val macosArm64Main by getting {
+            dependsOn(macosMain)
+        }
     }
 }
 
