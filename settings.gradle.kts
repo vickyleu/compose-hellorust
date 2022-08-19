@@ -26,6 +26,6 @@ include(
     ":app:macos",
 )
 include(":hello-rust")
-includeBuild("hello-rust-action")
+includeBuild("hello-rust-plugin")
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
