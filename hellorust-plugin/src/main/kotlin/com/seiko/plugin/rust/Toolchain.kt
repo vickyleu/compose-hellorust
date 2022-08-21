@@ -1,4 +1,4 @@
-package com.seiko.transform.action.rust
+package com.seiko.plugin.rust
 
 enum class ToolchainType {
     Android, IOS, Jvm, Darwin;

@@ -4,7 +4,7 @@ plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
     id("com.android.library")
-    id("com.seiko.transform.action.rust")
+    id("com.seiko.plugin.rust")
 }
 
 kotlin {
@@ -58,6 +58,7 @@ kotlin {
         }
         val macosMain by creating {
             dependsOn(nativeMain)
+
         }
         val macosX64Main by getting {
             dependsOn(macosMain)
@@ -74,15 +75,42 @@ kotlin {
                 val hellorust by creating {
                     defFile("${projectDir}/src/nativeInterop/cinterop/hellorust.def")
                     header(file("${projectDir}/rs/hellorust-native/hellorust.h"))
-                    includeDirs {
-                        allHeaders("${projectDir}/src/nativeInterop/cinterop/hellorust")
-                    }
+                    // includeDirs {
+                    //     allHeaders("${projectDir}/src/nativeInterop/cinterop/hellorust")
+                    // }
+
+
+                    // linkerOpts("-L${rootDir.resolve("hellorust/src/nativeInterop/cinterop/hellorust/").absolutePath}")
+                    // linkerOpts("-lhellorust")
+
                     // includeDirs("${projectDir}/src/nativeInterop/cinterop/hellorust")
                     // linkerOpts("-L ${projectDir.resolve("src/nativeInterop/cinterop/hellorust/").absolutePath}")
                     // includeDirs("src/nativeInterop/cinterop/hellorust")
                     // packageName("com.seiko.hellorust")
                 }
             }
+
+            binaries {
+                // staticLib {
+                //     linkerOpts("-v")
+                //     linkerOpts("-L${rootDir.resolve("hellorust/src/nativeInterop/cinterop/hellorust/").absolutePath}")
+                //     linkerOpts("-lhellorust")
+                // }
+                // sharedLib {
+                //     linkerOpts("-L${rootDir.resolve("hellorust/src/nativeInterop/cinterop/hellorust/").absolutePath}")
+                //     linkerOpts("-lhellorust")
+                // }
+                // framework {
+                //     linkerOpts("-L${rootDir.resolve("hellorust/src/nativeInterop/cinterop/hellorust/").absolutePath}")
+                //     linkerOpts("-lhellorust")
+                // }
+
+            //     executable {
+            //         linkerOpts("-L${rootDir.resolve("hellorust/src/nativeInterop/cinterop/hellorust/").absolutePath}")
+            //         linkerOpts("-lhellorust")
+            //     }
+            }
+
         }
     }
 }

@@ -17,7 +17,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "compose-hello-rust"
+rootProject.name = "compose-hellorust"
 include(
     ":app:common",
     ":app:android",
@@ -25,7 +25,7 @@ include(
     ":app:ios",
     ":app:macos",
 )
-include(":hello-rust")
-includeBuild("hello-rust-plugin")
+include(":hellorust")
+includeBuild("hellorust-plugin")
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")

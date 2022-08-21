@@ -15,9 +15,9 @@ dependencies {
 
 gradlePlugin {
     plugins {
-        register("HelloRustAction") {
-            id = "com.seiko.transform.action.rust"
-            implementationClass = "com.seiko.transform.action.rust.RustKotlinPlugin"
+            register("HelloRustPlugin") {
+            id = "com.seiko.plugin.rust"
+            implementationClass = "com.seiko.plugin.rust.RustKotlinPlugin"
         }
     }
 }

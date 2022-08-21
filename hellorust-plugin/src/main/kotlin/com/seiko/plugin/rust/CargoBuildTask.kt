@@ -1,4 +1,4 @@
-package com.seiko.transform.action.rust
+package com.seiko.plugin.rust
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.Project

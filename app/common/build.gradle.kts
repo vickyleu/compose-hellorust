@@ -19,7 +19,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(projects.helloRust)
+                api(projects.hellorust)
                 api(compose.ui)
                 api(compose.foundation)
                 api(compose.material)

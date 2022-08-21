@@ -4,5 +4,5 @@ pub fn hello_rust() -> String {
 }
 
 pub fn add_num(lhs: i32, rhs: i32) -> i32 {
-    return lhs + rhs + 100;
+    return lhs + rhs + 2;
 }

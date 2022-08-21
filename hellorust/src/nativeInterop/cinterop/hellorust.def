@@ -1,0 +1,1 @@
+# linkerOpts = -L/src/nativeInterop/cinterop/hellorust/ -lhellorust
