@@ -85,16 +85,16 @@ class RustKotlinPlugin : Plugin<Project> {
             description = "Build library (all targets)"
         }
 
-        toolchains.forEach {
+        toolchains.forEach { toolchain ->
             val targetBuildTask = project.tasks.maybeCreate(
-                "cargoBuild${it.type.name}",
+                "cargoBuild${toolchain.type.name}",
                 CargoBuildTask::class.java,
-            ).apply {
-                group = RUST_TASK_GROUP
-                description = "Build library (${it.type.name})"
-                toolchain = it
+            ).also {
+                it.group = RUST_TASK_GROUP
+                it.description = "Build library (${toolchain.type.name})"
+                it.toolchain = toolchain
             }
-            when (it.type) {
+            when (toolchain.type) {
                 ToolchainType.Android -> {
                     val javaPreCompileDebug by tasks.getting
                     javaPreCompileDebug.dependsOn(targetBuildTask)

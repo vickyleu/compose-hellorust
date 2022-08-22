@@ -11,8 +11,6 @@ kotlin {
                 freeCompilerArgs += listOf(
                     "-linker-option", "-framework", "-linker-option", "Metal"
                 )
-                linkerOpts("-L${rootDir.resolve("hellorust/src/nativeInterop/cinterop/hellorust/").absolutePath}")
-                linkerOpts("-lhellorust")
             }
         }
     }

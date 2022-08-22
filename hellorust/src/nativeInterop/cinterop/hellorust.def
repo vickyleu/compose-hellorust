@@ -1,1 +1,1 @@
-# linkerOpts = -L/src/nativeInterop/cinterop/hellorust/ -lhellorust
+linkerOpts = -L./hellorust/src/nativeInterop/cinterop/hellorust -lhellorust
