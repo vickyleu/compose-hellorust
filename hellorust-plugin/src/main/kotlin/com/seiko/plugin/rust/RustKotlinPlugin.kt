@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinMultiplatformPlugin
 
 class RustKotlinPlugin : Plugin<Project> {
     override fun apply(target: Project) {
-         with(target) {
+        with(target) {
             val cargoExtension = extensions.create("cargo", CargoExtension::class.java)
             afterEvaluate {
                 if (plugins.hasPlugin(KotlinMultiplatformPlugin::class.java)) {
@@ -45,31 +45,48 @@ class RustKotlinPlugin : Plugin<Project> {
                         abiFilters.addAll(listOf("x86", "x86_64", "armeabi-v7a", "arm64-v8a"))
                     }
                     toolchains.add(
-                        Toolchain(
-                            type = ToolchainType.Android,
-                            targets = abiFilters,
+                        Toolchain.Android(
+                            targets = abiFilters.mapTo(mutableSetOf()) { abi ->
+                                when (abi) {
+                                    "x86" -> "i686-linux-android"
+                                    "x86_64" -> "x86_64-linux-android"
+                                    "armeabi-v7a" -> " armv7-linux-androideabi"
+                                    "arm64-v8a" -> "aarch64-linux-android"
+                                    else -> ""
+                                }
+                            },
+                            abiFilters = abiFilters,
                         )
                     )
                 }
                 "jvm", "desktop" -> {
                     toolchains.add(
-                        Toolchain(
-                            type = ToolchainType.Jvm,
+                        Toolchain.Jvm(
                             targets = setOf(
                                 getCurrentOsTargetTriple(),
                             ),
                         )
                     )
                 }
-                "iosX64", "iosArm64" -> {
-
-                }
                 "macosX64", "macosArm64" -> {
                     toolchains.add(
-                        Toolchain(
-                            type = ToolchainType.Darwin,
+                        Toolchain.Darwin(
                             targets = setOf(
                                 getCurrentOsTargetTriple(),
+                            ),
+                        )
+                    )
+                }
+                "iosX64", "iosArm64", "iosSimulatorArm64" -> {
+                    toolchains.add(
+                        Toolchain.IOS(
+                            targets = setOf(
+                                when (it.name) {
+                                    "iosX64" -> "x86_64-apple-ios"
+                                    "iosArm64" -> "aarch64-apple-ios"
+                                    "iosSimulatorArm64" -> "aarch64-apple-ios-sim"
+                                    else -> ""
+                                }
                             ),
                         )
                     )
@@ -87,31 +104,32 @@ class RustKotlinPlugin : Plugin<Project> {
 
         toolchains.forEach { toolchain ->
             val targetBuildTask = project.tasks.maybeCreate(
-                "cargoBuild${toolchain.type.name}",
+                "cargoBuild${toolchain.name}",
                 CargoBuildTask::class.java,
             ).also {
                 it.group = RUST_TASK_GROUP
-                it.description = "Build library (${toolchain.type.name})"
+                it.description = "Build library (${toolchain.name})"
                 it.toolchain = toolchain
             }
-            when (toolchain.type) {
-                ToolchainType.Android -> {
+            when (toolchain) {
+                is Toolchain.Android -> {
                     val javaPreCompileDebug by tasks.getting
                     javaPreCompileDebug.dependsOn(targetBuildTask)
                     val javaPreCompileRelease by tasks.getting
                     javaPreCompileRelease.dependsOn(targetBuildTask)
                 }
-                ToolchainType.Jvm -> {
+                is Toolchain.Jvm -> {
                     // TODO replace desktop name
                     val compileKotlinDesktop by tasks.getting
                     compileKotlinDesktop.dependsOn(targetBuildTask)
                 }
-                ToolchainType.Darwin -> {
+                is Toolchain.Darwin -> {
                     val compileKotlinMacosX64 by tasks.getting
                     compileKotlinMacosX64.dependsOn(targetBuildTask)
                 }
-                ToolchainType.IOS -> {
-
+                is Toolchain.IOS -> {
+                    val compileKotlinIosX64 by tasks.getting
+                    compileKotlinIosX64.dependsOn(targetBuildTask)
                 }
             }
             buildTask.dependsOn(targetBuildTask)

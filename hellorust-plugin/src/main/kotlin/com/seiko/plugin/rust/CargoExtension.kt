@@ -10,10 +10,12 @@ open class CargoExtension {
     var nativeSuffix = "-native"
 
     var cargoCommand: String = "cargo"
-    var rustUpChannel: String = ""
+    var rustUpCommand: String = "rustup"
     var pythonCommand: String = "python"
+    var ndkCommand: String = "ndk"
+    var lipoCommand: String = "lipo"
 
     var androidJniDir: String = "./src/androidMain/jniLibs"
     var jvmJniDir: String = "./src/jvmMain/resources/jni"
-    val darwinDir: String = "./src/nativeInterop/cinterop"
+    val cinteropDir: String = "./src/nativeInterop/cinterop"
 }
