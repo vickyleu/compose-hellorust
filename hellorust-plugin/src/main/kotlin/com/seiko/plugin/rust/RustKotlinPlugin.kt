@@ -77,7 +77,8 @@ class RustKotlinPlugin : Plugin<Project> {
                         )
                     )
                 }
-                "iosX64", "iosArm64", "iosSimulatorArm64" -> {
+                "iosX64" -> {
+                    // , "iosArm64", "iosSimulatorArm64" -> {
                     toolchains.add(
                         Toolchain.IOS(
                             targets = setOf(

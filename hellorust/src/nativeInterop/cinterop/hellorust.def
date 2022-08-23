@@ -1,1 +1,4 @@
 # linkerOpts = -L./hellorust/src/nativeInterop/cinterop/hellorust -lhellorust
+staticLibraries.mingw = hellorust.lib
+staticLibraries.linux = libhellorust.a
+staticLibraries.osx = libhellorust.a

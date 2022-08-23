@@ -74,11 +74,9 @@ kotlin {
                     val hellorust by creating {
                         defFile("src/nativeInterop/cinterop/hellorust.def")
                         header("rs/hellorust-native/hellorust.h")
+                        extraOpts("-libraryPath", "${projectDir}/src/nativeInterop/cinterop/hellorust")
                     }
                 }
-                kotlinOptions.freeCompilerArgs = listOf(
-                    "-include-binary", "${projectDir}/src/nativeInterop/cinterop/hellorust/libhellorust.a"
-                )
             }
         }
     }
