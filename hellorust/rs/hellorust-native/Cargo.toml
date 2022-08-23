@@ -5,7 +5,7 @@ edition = "2021"
 
 [lib]
 name = "hellorust"
-crate-type = ["cdylib", "staticlib"]
+crate-type = ["staticlib"]
 
 [dependencies]
 hellorust_core = { path = "../hellorust" }

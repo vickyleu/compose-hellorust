@@ -1,4 +1,5 @@
 import org.jetbrains.compose.compose
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
     kotlin("multiplatform")
@@ -67,15 +68,17 @@ kotlin {
             dependsOn(macosMain)
         }
 
-        targets.withType<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget> {
+        targets.withType<KotlinNativeTarget> {
             val main by compilations.getting {
-                defaultSourceSet.dependsOn(nativeMain)
                 cinterops {
                     val hellorust by creating {
                         defFile("src/nativeInterop/cinterop/hellorust.def")
                         header("rs/hellorust-native/hellorust.h")
                     }
                 }
+                kotlinOptions.freeCompilerArgs = listOf(
+                    "-include-binary", "${projectDir}/src/nativeInterop/cinterop/hellorust/libhellorust.a"
+                )
             }
         }
     }
