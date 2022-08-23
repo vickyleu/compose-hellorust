@@ -6,8 +6,11 @@ open class CargoExtension {
     var profile: String = "debug"
     var isVerbose: Boolean = false
 
-    var jniSuffix = "-jni"
-    var nativeSuffix = "-native"
+    var isJniStaticLib: Boolean = false
+    var isNativeStaticLib: Boolean = true
+
+    var jniSuffix: String = "-jni"
+    var nativeSuffix: String = "-native"
 
     var cargoCommand: String = "cargo"
     var rustUpCommand: String = "rustup"

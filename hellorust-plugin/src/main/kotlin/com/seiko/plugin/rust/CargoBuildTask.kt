@@ -27,7 +27,7 @@ open class CargoBuildTask : DefaultTask() {
         toolchain: Toolchain.Android,
         cargoExtension: CargoExtension,
     ) {
-        val moduleDir = getModuleDir(cargoExtension, toolchain)
+        val moduleDir = getModuleDir(toolchain, cargoExtension)
         exec {
             workingDir = moduleDir
             commandLine = buildList {
@@ -49,96 +49,83 @@ open class CargoBuildTask : DefaultTask() {
         toolchain: Toolchain.Jvm,
         cargoExtension: CargoExtension,
     ) {
-        val moduleDir = getModuleDir(cargoExtension, toolchain)
         val target = toolchain.targets.first()
-        exec {
-            workingDir = moduleDir
-            commandLine = buildList {
-                add(cargoExtension.cargoCommand)
-                add("build")
-                add("--target")
-                add(target)
-                addCommonArgs(cargoExtension)
-            }
-        }
-        val fromDir = File(moduleDir, "target")
-        val copyDir = getDir(cargoExtension.jvmJniDir)
-        copy {
-            from(File(fromDir, "$target/${cargoExtension.profile}"))
-            into(File(copyDir, target.split('-').first()))
-            val libName = cargoExtension.libName
-            include("lib${libName}.so")
-            include("lib${libName}.dylib")
-            include("${libName}.dll")
-        }
+        execRustBuild(
+            toolchain = toolchain,
+            cargoExtension = cargoExtension,
+            target = target,
+        )
+        execMoveLib(
+            toolchain = toolchain,
+            cargoExtension = cargoExtension,
+            target = target,
+            intoDir = File(getDir(cargoExtension.jvmJniDir), target.split('-').first()),
+        )
     }
 
     private fun Project.execRustDarwin(
         toolchain: Toolchain.Darwin,
         cargoExtension: CargoExtension,
     ) {
-        val moduleDir = getModuleDir(cargoExtension, toolchain)
         val target = toolchain.targets.first()
-        exec {
-            workingDir = moduleDir
-            commandLine = buildList {
-                add(cargoExtension.cargoCommand)
-                add("build")
-                add("--target")
-                add(target)
-                addCommonArgs(cargoExtension)
-            }
-        }
-        val fromDir = File(moduleDir, "target")
-        val libName = cargoExtension.libName
-        val copyDir = File(getDir(cargoExtension.cinteropDir), libName)
-        delete {
-            delete(copyDir)
-        }
-        copy {
-            from(File(fromDir, "$target/${cargoExtension.profile}"))
-            into(copyDir)
-            include("lib${libName}.so")
-            include("lib${libName}.dylib")
-            include("${libName}.dll")
-        }
+        execRustBuild(
+            toolchain = toolchain,
+            cargoExtension = cargoExtension,
+            target = target,
+        )
+        execMoveLib(
+            toolchain = toolchain,
+            cargoExtension = cargoExtension,
+            target = target,
+            intoDir = File(getDir(cargoExtension.cinteropDir), cargoExtension.libName),
+        )
     }
 
     private fun Project.execRustIOS(
         toolchain: Toolchain.IOS,
         cargoExtension: CargoExtension,
     ) {
-        val moduleDir = getModuleDir(cargoExtension, toolchain)
         val target = toolchain.targets.first()
-        exec {
-            workingDir = moduleDir
-            commandLine = buildList {
-                add(cargoExtension.cargoCommand)
-                add("build")
-                add("--target")
-                add(target)
-                addCommonArgs(cargoExtension)
-            }
-        }
-        exec {
-            workingDir = moduleDir
-            commandLine = buildList {
-                add(cargoExtension.cargoCommand)
-                add(cargoExtension.lipoCommand)
-                addCommonArgs(cargoExtension)
-            }
-        }
-        val targetBuildDir = File(moduleDir, "target")
-        val targetIntoDir = getDir(cargoExtension.cinteropDir)
-        val libName = cargoExtension.libName
-        val copyDir = File(targetIntoDir, libName)
+        execRustBuild(
+            toolchain = toolchain,
+            cargoExtension = cargoExtension,
+            target = target,
+        )
+        execMoveLib(
+            toolchain = toolchain,
+            cargoExtension = cargoExtension,
+            target = target,
+            intoDir = File(getDir(cargoExtension.cinteropDir), cargoExtension.libName),
+        )
+    }
+
+    private fun Project.execMoveLib(
+        toolchain: Toolchain,
+        cargoExtension: CargoExtension,
+        target: String,
+        intoDir: File,
+    ) {
+        val moduleDir = getModuleDir(toolchain, cargoExtension)
+        val fromDir = File(moduleDir, "target/$target/${cargoExtension.profile}")
         delete {
-            delete(copyDir)
+            delete(intoDir)
         }
         copy {
-            from(File(targetBuildDir, "universal/${cargoExtension.profile}"))
-            into(copyDir)
-            include("lib${libName}.a")
+            from(fromDir)
+            into(intoDir)
+            val libName = cargoExtension.libName
+            val isStaticLib = when (toolchain) {
+                is Toolchain.Android, is Toolchain.Jvm -> cargoExtension.isJniStaticLib
+                is Toolchain.IOS, is Toolchain.Darwin -> cargoExtension.isNativeStaticLib
+            }
+            if (isStaticLib) {
+                include("lib${libName}.a")
+                include("lib${libName}.lib")
+            } else {
+                include("lib${libName}.so")
+                include("lib${libName}.dylib")
+                include("${libName}.dll")
+            }
         }
     }
 
@@ -156,8 +143,25 @@ open class CargoBuildTask : DefaultTask() {
         }
     }
 
-    private fun getModuleDir(cargoExtension: CargoExtension, toolchain: Toolchain): File {
-        val libName = cargoExtension.libName + when(toolchain) {
+    private fun Project.execRustBuild(
+        toolchain: Toolchain,
+        cargoExtension: CargoExtension,
+        target: String,
+    ) {
+        exec {
+            workingDir = getModuleDir(toolchain, cargoExtension)
+            commandLine = buildList {
+                add(cargoExtension.cargoCommand)
+                add("build")
+                add("--target")
+                add(target)
+                addCommonArgs(cargoExtension)
+            }
+        }
+    }
+
+    private fun getModuleDir(toolchain: Toolchain, cargoExtension: CargoExtension): File {
+        val libName = cargoExtension.libName + when (toolchain) {
             is Toolchain.Android, is Toolchain.Jvm -> cargoExtension.jniSuffix
             is Toolchain.IOS, is Toolchain.Darwin -> cargoExtension.nativeSuffix
         }
