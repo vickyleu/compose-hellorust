@@ -114,18 +114,11 @@ open class CargoBuildTask : DefaultTask() {
             from(fromDir)
             into(intoDir)
             val libName = cargoExtension.libName
-            val isStaticLib = when (toolchain) {
-                is Toolchain.Android, is Toolchain.Jvm -> cargoExtension.isJniStaticLib
-                is Toolchain.IOS, is Toolchain.Darwin -> cargoExtension.isNativeStaticLib
-            }
-            if (isStaticLib) {
-                include("lib$libName.a")
-                include("lib$libName.lib")
-            } else {
-                include("lib$libName.so")
-                include("lib$libName.dylib")
-                include("$libName.dll")
-            }
+            include("lib$libName.a")
+            include("$libName.lib")
+            include("lib$libName.so")
+            include("lib$libName.dylib")
+            include("$libName.dll")
         }
     }
 

@@ -76,7 +76,11 @@ class RustKotlinPlugin : Plugin<Project> {
                         Toolchain.Darwin(
                             name = name,
                             targets = setOf(
-                                getCurrentOsTargetTriple(),
+                                when (it.targetName) {
+                                    "macosX64" ->  "x86_64-apple-darwin"
+                                    "macosArm64" -> "aarch64-apple-darwin"
+                                    else -> ""
+                                }
                             ),
                         )
                     )
@@ -86,7 +90,7 @@ class RustKotlinPlugin : Plugin<Project> {
                         Toolchain.IOS(
                             name = name,
                             targets = setOf(
-                                when (it.name) {
+                                when (it.targetName) {
                                     "iosX64" -> "x86_64-apple-ios"
                                     "iosArm64" -> "aarch64-apple-ios"
                                     "iosSimulatorArm64" -> "aarch64-apple-ios-sim"
