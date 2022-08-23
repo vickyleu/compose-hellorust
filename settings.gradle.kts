@@ -23,7 +23,7 @@ include(
     ":app:android",
     ":app:desktop",
     ":app:ios",
-    ":app:macos",
+    ":app:macos"
 )
 include(":hellorust")
 includeBuild("hellorust-plugin")

@@ -9,8 +9,12 @@ kotlin {
             executable {
                 entryPoint = "com.seiko.compose.hellorust.demo.main"
                 freeCompilerArgs = freeCompilerArgs + listOf(
-                    "-linker-option", "-framework", "-linker-option", "Metal",
-                    "-linker-option", "-lresolv",
+                    "-linker-option",
+                    "-framework",
+                    "-linker-option",
+                    "Metal",
+                    "-linker-option",
+                    "-lresolv"
                 )
             }
         }

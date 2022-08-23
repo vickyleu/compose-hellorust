@@ -4,6 +4,7 @@ actual object HelloRust {
     init {
         loadNativeLibrary()
     }
+
     @JvmStatic
     actual external fun hello(): String
 

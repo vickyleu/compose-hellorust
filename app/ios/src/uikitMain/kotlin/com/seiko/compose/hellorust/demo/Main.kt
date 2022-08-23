@@ -64,4 +64,3 @@ class SkikoAppDelegate : UIResponder, UIApplicationDelegateProtocol {
         return true
     }
 }
-

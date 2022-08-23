@@ -2,7 +2,6 @@ package com.seiko.compose.hellorust
 
 import hellorust.add_native
 import hellorust.hello_native
-import kotlinx.cinterop.rawValue
 import kotlinx.cinterop.toKStringFromUtf8
 
 actual object HelloRust {

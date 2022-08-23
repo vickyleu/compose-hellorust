@@ -10,8 +10,7 @@ allprojects {
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         kotlinOptions {
             jvmTarget = Versions.Java.jvmTarget
-            freeCompilerArgs = freeCompilerArgs + listOf(
-            )
+            freeCompilerArgs = freeCompilerArgs + listOf()
         }
     }
 
@@ -28,7 +27,12 @@ allprojects {
         kotlin {
             target("**/*.kt")
             targetExclude("$buildDir/**/*.kt", "bin/**/*.kt", "buildSrc/**/*.kt")
-            ktlint(Versions.ktlint)
+            ktlint(Versions.ktlint).editorConfigOverride(
+                mapOf(
+                    // rules: https://github.com/pinterest/ktlint/blob/master/README.md#standard-rules
+                    "disabled_rules" to "filename,trailing-comma"
+                )
+            )
         }
         kotlinGradle {
             target("*.gradle.kts")
