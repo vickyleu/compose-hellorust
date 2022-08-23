@@ -1,10 +1,10 @@
 package com.seiko.plugin.rust
 
 import com.android.build.gradle.LibraryExtension
-import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.configurationcache.extensions.capitalized
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -36,7 +36,8 @@ class RustKotlinPlugin : Plugin<Project> {
 
         val toolchains = mutableSetOf<Toolchain>()
         kmpExtension.targets.forEach {
-            when (it.name) {
+            val name = it.targetName.capitalized()
+            when (it.targetName) {
                 "android" -> {
                     val androidExtension = extensions.getByType(LibraryExtension::class.java)
                     val abiFilters = androidExtension.defaultConfig.ndk.abiFilters
@@ -46,11 +47,12 @@ class RustKotlinPlugin : Plugin<Project> {
                     }
                     toolchains.add(
                         Toolchain.Android(
+                            name = name,
                             targets = abiFilters.mapTo(mutableSetOf()) { abi ->
                                 when (abi) {
                                     "x86" -> "i686-linux-android"
                                     "x86_64" -> "x86_64-linux-android"
-                                    "armeabi-v7a" -> " armv7-linux-androideabi"
+                                    "armeabi-v7a" -> "armv7-linux-androideabi"
                                     "arm64-v8a" -> "aarch64-linux-android"
                                     else -> ""
                                 }
@@ -62,6 +64,7 @@ class RustKotlinPlugin : Plugin<Project> {
                 "jvm", "desktop" -> {
                     toolchains.add(
                         Toolchain.Jvm(
+                            name = name,
                             targets = setOf(
                                 getCurrentOsTargetTriple(),
                             ),
@@ -71,16 +74,17 @@ class RustKotlinPlugin : Plugin<Project> {
                 "macosX64", "macosArm64" -> {
                     toolchains.add(
                         Toolchain.Darwin(
+                            name = name,
                             targets = setOf(
                                 getCurrentOsTargetTriple(),
                             ),
                         )
                     )
                 }
-                "iosX64" -> {
-                    // , "iosArm64", "iosSimulatorArm64" -> {
+                "iosX64", "iosArm64", "iosSimulatorArm64" -> {
                     toolchains.add(
                         Toolchain.IOS(
+                            name = name,
                             targets = setOf(
                                 when (it.name) {
                                     "iosX64" -> "x86_64-apple-ios"
@@ -93,14 +97,6 @@ class RustKotlinPlugin : Plugin<Project> {
                     )
                 }
             }
-        }
-
-        val buildTask = project.tasks.maybeCreate(
-            "cargoBuild",
-            DefaultTask::class.java
-        ).apply {
-            group = RUST_TASK_GROUP
-            description = "Build library (all targets)"
         }
 
         toolchains.forEach { toolchain ->
@@ -119,21 +115,11 @@ class RustKotlinPlugin : Plugin<Project> {
                     val javaPreCompileRelease by tasks.getting
                     javaPreCompileRelease.dependsOn(targetBuildTask)
                 }
-                is Toolchain.Jvm -> {
-                    // TODO replace desktop name
-                    val compileKotlinDesktop by tasks.getting
-                    compileKotlinDesktop.dependsOn(targetBuildTask)
-                }
-                is Toolchain.Darwin -> {
-                    val compileKotlinMacosX64 by tasks.getting
-                    compileKotlinMacosX64.dependsOn(targetBuildTask)
-                }
-                is Toolchain.IOS -> {
-                    val compileKotlinIosX64 by tasks.getting
-                    compileKotlinIosX64.dependsOn(targetBuildTask)
+                is Toolchain.Jvm, is Toolchain.Darwin, is Toolchain.IOS -> {
+                    val task = tasks.getByName("compileKotlin${toolchain.name}")
+                    task.dependsOn(targetBuildTask)
                 }
             }
-            buildTask.dependsOn(targetBuildTask)
         }
     }
 

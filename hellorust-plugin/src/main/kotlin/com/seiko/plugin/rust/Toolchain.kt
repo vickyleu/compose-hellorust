@@ -6,31 +6,35 @@ sealed class Toolchain(
 ) {
 
     class Android(
+        name: String,
         targets: Set<String>,
         val abiFilters: Set<String>,
     ) : Toolchain(
-        name = "Android",
+        name = name,
         targets = targets,
     )
 
     class IOS(
+        name: String,
         targets: Set<String>,
     ) : Toolchain(
-        name = "IOS",
+        name = name,
         targets = targets,
     )
 
     class Jvm(
+        name: String,
         targets: Set<String>,
     ) : Toolchain(
-        name = "Jvm",
+        name = name,
         targets = targets,
     )
 
     class Darwin(
+        name: String,
         targets: Set<String>,
     ) : Toolchain(
-        name = "Darwin",
+        name = name,
         targets = targets,
     )
 }
