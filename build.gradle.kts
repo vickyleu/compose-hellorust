@@ -22,6 +22,8 @@ subprojects {
 }
 
 allprojects {
+    // TODO  Iguana的bug，所有module都会调用一下testClasses,估计是哪个傻逼手贱忘记删了, 需要手动添加
+    tasks.register("testClasses")
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         this.compilerOptions {
@@ -30,14 +32,6 @@ allprojects {
             allWarningsAsErrors.set(false)
         }
     }
-
-    /*configurations.all {
-        resolutionStrategy.dependencySubstitution {
-            substitute(module("org.jetbrains.compose.compiler:compiler")).apply {
-                using(module("androidx.compose.compiler:compiler:${"1.3.0"}"))
-            }
-        }
-    }*/
 
     apply(plugin = "com.diffplug.spotless")
     spotless {

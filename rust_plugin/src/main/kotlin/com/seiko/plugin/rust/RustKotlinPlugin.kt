@@ -113,30 +113,31 @@ class RustKotlinPlugin : Plugin<Project> {
         toolchains.forEach { toolchain ->
             dependTask(toolchain)
         }
-       /* toolchains.forEach { toolchain ->
-            val targetBuildTask = project.tasks.maybeCreate(
-                "cargoBuild${toolchain.first.name}",
-                CargoBuildTask::class.java,
-            ).also {
-                it.group = RUST_TASK_GROUP
-                it.description = "Build library (${toolchain.first.name})"
-                it.toolchain = toolchain
-            }
-            when (toolchain.first) {
-                is Toolchain.Android -> {
-                    val javaPreCompileDebug by tasks.getting
-                    javaPreCompileDebug.dependsOn(targetBuildTask)
-                    val javaPreCompileRelease by tasks.getting
-                    javaPreCompileRelease.dependsOn(targetBuildTask)
-                }
+        /* toolchains.forEach { toolchain ->
+             val targetBuildTask = project.tasks.maybeCreate(
+                 "cargoBuild${toolchain.first.name}",
+                 CargoBuildTask::class.java,
+             ).also {
+                 it.group = RUST_TASK_GROUP
+                 it.description = "Build library (${toolchain.first.name})"
+                 it.toolchain = toolchain
+             }
+             when (toolchain.first) {
+                 is Toolchain.Android -> {
+                     val javaPreCompileDebug by tasks.getting
+                     javaPreCompileDebug.dependsOn(targetBuildTask)
+                     val javaPreCompileRelease by tasks.getting
+                     javaPreCompileRelease.dependsOn(targetBuildTask)
+                 }
 
-                is Toolchain.Jvm, is Toolchain.Darwin, is Toolchain.IOS -> {
-                    val task = tasks.getByName("compileKotlin${toolchain.first.name}")
-                    task.dependsOn(targetBuildTask)
-                }
-            }
-        }*/
+                 is Toolchain.Jvm, is Toolchain.Darwin, is Toolchain.IOS -> {
+                     val task = tasks.getByName("compileKotlin${toolchain.first.name}")
+                     task.dependsOn(targetBuildTask)
+                 }
+             }
+         }*/
     }
+
     private fun Project.dependTask(toolchain: Pair<Toolchain, KotlinTarget>) {
         val targetBuildTask = project.tasks.maybeCreate(
             "cargoBuild${toolchain.first.name}",
@@ -161,27 +162,30 @@ class RustKotlinPlugin : Plugin<Project> {
 
             is Toolchain.Jvm, is Toolchain.Darwin, is Toolchain.IOS -> {
                 try {
-                    if (toolchain.second is KotlinNativeTarget) {
-                        val cinterops =
-                            (toolchain.second as KotlinNativeTarget).compilations.getByName("main").cinterops
-                        val interopList = cinterops.mapNotNull {
-                            val interopProcessingTaskName = it.interopProcessingTaskName
-                            if (interopProcessingTaskName.contains(toolchain.second.targetName.capitalized())) {
-                                interopProcessingTaskName
-                            } else null
-                        }
-                        interopList.forEach {
-                            val task = tasks.getByPath(it)
-                            task.dependsOn(targetBuildTask)
-                            task.setMustRunAfter(listOf(targetBuildTask))
-                        }
-                    }
-                } catch (e: Exception) {
-                    val task = tasks.getByName("compileKotlin${toolchain.first.name}")
+                    val task = tasks.getByName("compileKotlin${toolchain.first.name.capitalized()}")
                     task.dependsOn(targetBuildTask)
                     task.setMustRunAfter(listOf(targetBuildTask))
-                }
 
+                } catch (ignore: Exception) {
+                    try {
+                        if (toolchain.second is KotlinNativeTarget) {
+                            val cinterops =
+                                (toolchain.second as KotlinNativeTarget).compilations.getByName("main").cinterops
+                            val interopList = cinterops.mapNotNull {
+                                val interopProcessingTaskName = it.interopProcessingTaskName
+                                if (interopProcessingTaskName.contains(toolchain.second.targetName.capitalized())) {
+                                    interopProcessingTaskName
+                                } else null
+                            }
+                            interopList.forEach {
+                                val task = tasks.getByPath(it)
+                                task.dependsOn(targetBuildTask)
+                                task.setMustRunAfter(listOf(targetBuildTask))
+                            }
+                        }
+                    } catch (ignore: Exception) {
+                    }
+                }
             }
         }
     }

@@ -2,6 +2,13 @@
 
 rootProject.name = "compose-hellorust"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+// TODO    mother fucker, WorkQueue error throw in Iguana
+// TODO   夭寿啦, Iguana 会存在testClasses的工作队列问题,所有build类型的module需要排除掉
+// TODO    然后再build.gradle.kts中allProject注册一个testClasses的任务就可以了
+gradle.startParameter.excludedTaskNames.addAll(listOf(
+//    ":buildSrc:testClasses",
+    ":rust_plugin:testClasses",
+))
 
 include(
     ":app:common",

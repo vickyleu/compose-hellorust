@@ -3,9 +3,6 @@ plugins {
     id("org.jetbrains.compose")
 }
 
-task("testClasses") {
-    //https://github.com/robolectric/robolectric/issues/1802#issuecomment-137401530
-}
 
 kotlin {
     applyDefaultHierarchyTemplate()
