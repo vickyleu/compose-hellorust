@@ -2,12 +2,12 @@ package com.seiko.plugin.rust
 
 sealed class Toolchain(
     val name: String,
-    val targets: Set<Pair<String, String>>
+    val targets: Set<String>
 ) {
 
     class Android(
         name: String,
-        targets: Set<Pair<String, String>>,
+        targets: Set<String>,
         val abiFilters: Set<String>,
     ) : Toolchain(
         name = name,
@@ -16,7 +16,7 @@ sealed class Toolchain(
 
     class IOS(
         name: String,
-        targets: Set<Pair<String, String>>,
+        targets: Set<String>,
     ) : Toolchain(
         name = name,
         targets = targets,
@@ -24,7 +24,7 @@ sealed class Toolchain(
 
     class Jvm(
         name: String,
-        targets: Set<Pair<String, String>>,
+        targets: Set<String>,
     ) : Toolchain(
         name = name,
         targets = targets,
@@ -32,7 +32,7 @@ sealed class Toolchain(
 
     class Darwin(
         name: String,
-        targets: Set<Pair<String, String>>,
+        targets: Set<String>,
     ) : Toolchain(
         name = name,
         targets = targets,

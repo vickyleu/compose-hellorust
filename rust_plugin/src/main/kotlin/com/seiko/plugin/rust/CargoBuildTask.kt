@@ -4,22 +4,36 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.TaskAction
+import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import java.io.File
 
 open class CargoBuildTask : DefaultTask() {
 
     @Input
-    lateinit var toolchain: Toolchain
+    lateinit var toolchain: Pair<Toolchain, KotlinTarget>
 
     @TaskAction
     fun build() = with(project) {
         val cargoExtension = extensions.getByType(CargoExtension::class.java)
-        execRustcTarget(toolchain, cargoExtension)
-        when (val toolchain = toolchain) {
+        execRustcTarget(toolchain.first, cargoExtension)
+        when (val toolchain = toolchain.first) {
             is Toolchain.Android -> execRustAndroid(toolchain, cargoExtension)
-            is Toolchain.Jvm -> execRustJvm(toolchain, cargoExtension)
-            is Toolchain.Darwin -> execRustDarwin(toolchain, cargoExtension)
-            is Toolchain.IOS -> execRustIOS(toolchain, cargoExtension)
+            is Toolchain.Jvm -> execRustJvm(
+                toolchain,
+                cargoExtension
+            )
+
+            is Toolchain.Darwin -> execRustDarwin(
+                toolchain,
+                this@CargoBuildTask.toolchain.second,
+                cargoExtension
+            )
+
+            is Toolchain.IOS -> execRustIOS(
+                toolchain,
+                this@CargoBuildTask.toolchain.second,
+                cargoExtension
+            )
         }
     }
 
@@ -59,12 +73,13 @@ open class CargoBuildTask : DefaultTask() {
             toolchain = toolchain,
             cargoExtension = cargoExtension,
             target = target,
-            intoDir = File(getDir(cargoExtension.jvmJniDir), target.first.split('-').first()),
+            intoDir = File(getDir(cargoExtension.jvmJniDir), target.split('-').first()),
         )
     }
 
     private fun Project.execRustDarwin(
         toolchain: Toolchain.Darwin,
+        kotlinTarget: KotlinTarget,
         cargoExtension: CargoExtension,
     ) {
         val target = toolchain.targets.first()
@@ -79,13 +94,14 @@ open class CargoBuildTask : DefaultTask() {
             target = target,
             intoDir = File(
                 getDir(cargoExtension.cinteropDir),
-                "${cargoExtension.libName}/${target.second}"
+                "${cargoExtension.libName}/${kotlinTarget.targetName}"
             ),
         )
     }
 
     private fun Project.execRustIOS(
         toolchain: Toolchain.IOS,
+        kotlinTarget: KotlinTarget,
         cargoExtension: CargoExtension,
     ) {
         val target = toolchain.targets.first()
@@ -100,7 +116,7 @@ open class CargoBuildTask : DefaultTask() {
             target = target,
             intoDir = File(
                 getDir(cargoExtension.cinteropDir),
-                "${cargoExtension.libName}/${target.second}"
+                "${cargoExtension.libName}/${kotlinTarget.targetName}"
             ),
         )
     }
@@ -108,11 +124,11 @@ open class CargoBuildTask : DefaultTask() {
     private fun Project.execMoveLib(
         toolchain: Toolchain,
         cargoExtension: CargoExtension,
-        target: Pair<String, String>,
+        target: String,
         intoDir: File,
     ) {
         val moduleDir = getModuleDir(toolchain, cargoExtension)
-        val fromDir = File(moduleDir, "target/${target.first}/${cargoExtension.profile}")
+        val fromDir = File(moduleDir, "target/${target}/${cargoExtension.profile}")
         delete {
             delete(intoDir)
         }
@@ -137,7 +153,7 @@ open class CargoBuildTask : DefaultTask() {
                 add(cargoExtension.rustUpCommand)
                 add("target")
                 add("add")
-                addAll(toolchain.targets.map { it.first })
+                addAll(toolchain.targets)
             }
         }
     }
@@ -145,7 +161,7 @@ open class CargoBuildTask : DefaultTask() {
     private fun Project.execRustBuild(
         toolchain: Toolchain,
         cargoExtension: CargoExtension,
-        target: Pair<String, String>,
+        target: String,
     ) {
         exec {
             workingDir = getModuleDir(toolchain, cargoExtension)
@@ -153,7 +169,7 @@ open class CargoBuildTask : DefaultTask() {
                 add(cargoExtension.cargoCommand)
                 add("build")
                 add("--target")
-                add(target.first)
+                add(target)
                 addCommonArgs(cargoExtension)
             }
         }
