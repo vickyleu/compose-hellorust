@@ -1,11 +1,20 @@
 plugins {
-    kotlin("multiplatform")
-    id("org.jetbrains.compose")
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.jetbrains.compose)
+}
+
+task("testClasses") {
+    //https://github.com/robolectric/robolectric/issues/1802#issuecomment-137401530
 }
 
 kotlin {
-    ios("uikit") {
-        binaries {
+    applyDefaultHierarchyTemplate()
+    listOf(
+        iosX64("uikitX64"),
+        iosArm64("uikitArm64"),
+        iosSimulatorArm64("uikitSimulator")
+    ).forEach {
+        it. binaries {
             executable {
                 entryPoint = "com.seiko.compose.hellorust.demo.main"
                 freeCompilerArgs = freeCompilerArgs + listOf(
@@ -19,17 +28,30 @@ kotlin {
             }
         }
     }
+
     sourceSets {
-        val uikitMain by getting {
+        val uikitMain by creating{
+            dependsOn(commonMain.get())
             dependencies {
                 implementation(projects.app.common)
             }
+        }
+
+        val uikitX64Main by getting {
+            dependsOn(uikitMain)
+        }
+        val uikitArm64Main by getting {
+            dependsOn(uikitMain)
+        }
+        val uikitSimulatorMain by getting {
+            dependsOn(uikitMain)
         }
     }
 }
 
 compose.experimental {
-    uikit.application {
+
+    /*uikit.application {
         bundleIdPrefix = "com.seiko.compose.hellorust.demo"
         projectName = "ComposeHelloRust"
         deployConfigurations {
@@ -37,7 +59,7 @@ compose.experimental {
                 device = org.jetbrains.compose.experimental.dsl.IOSDevices.IPHONE_13_MINI
             }
         }
-    }
+    }*/
 }
 
 val runIos by tasks.registering {

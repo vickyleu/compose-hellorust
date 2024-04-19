@@ -1,4 +1,22 @@
 # linkerOpts = -L./hellorust/src/nativeInterop/cinterop/hellorust -lhellorust
-staticLibraries.mingw = hellorust.lib
-staticLibraries.linux = libhellorust.a
-staticLibraries.osx = libhellorust.a
+package = hellorust
+
+
+ staticLibraries.mingw = hellorust.dll
+ staticLibraries.linux = libhellorust.a
+ staticLibraries.osx = libhellorust.a
+ staticLibraries.ios = libhellorust.a
+
+# headers = rs/hellorust-native/hellorust.h
+
+#linkerOpts.linux_arm32_hfp =
+#linkerOpts.linux_x64 =
+#linkerOpts.linux_arm64 =
+#linkerOpts.mingw_x64 =
+#linkerOpts.mingw =
+
+#linkerOpts.android_x64 =
+#linkerOpts.android_x86 =
+#linkerOpts.android_arm32 =
+#linkerOpts.android_arm64 =
+

@@ -33,13 +33,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		5761544028B5AB1400860F91 /* HelloRust.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = HelloRust.app; path = "/Users/seiko/Developer/Android/Library/compose-hellorust/ios/HelloRust/build/Debug-iphoneos/HelloRust.app"; sourceTree = "<absolute>"; };
+		2F5A09CD2BC2ADF9007571C7 /* HelloRust.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HelloRust.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2F5A09CE2BC2ADF9007571C7 /* HelloRustTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HelloRustTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		2F5A09CF2BC2ADF9007571C7 /* HelloRustUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HelloRustUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5761544328B5AB1400860F91 /* HelloRustApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelloRustApp.swift; sourceTree = "<group>"; };
 		5761544528B5AB1400860F91 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		5761544728B5AB1500860F91 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		5761544A28B5AB1500860F91 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		5761545028B5AB1500860F91 /* HelloRustTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = HelloRustTests.xctest; path = "/Users/seiko/Developer/Android/Library/compose-hellorust/ios/HelloRust/build/Debug-iphoneos/HelloRustTests.xctest"; sourceTree = "<absolute>"; };
-		5761545A28B5AB1500860F91 /* HelloRustUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = HelloRustUITests.xctest; path = "/Users/seiko/Developer/Android/Library/compose-hellorust/ios/HelloRust/build/Debug-iphoneos/HelloRustUITests.xctest"; sourceTree = "<absolute>"; };
 		5761547028B5ADB800860F91 /* HelloRust-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "HelloRust-Bridging-Header.h"; sourceTree = "<group>"; };
 		5761547128B5ADE300860F91 /* hellorust.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = hellorust.h; path = "../../hellorust/rs/hellorust-native/hellorust.h"; sourceTree = "<group>"; };
 		5761547228B5B28500860F91 /* RustTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RustTest.swift; sourceTree = "<group>"; };
@@ -77,6 +77,9 @@
 			children = (
 				5761544228B5AB1400860F91 /* HelloRust */,
 				5761546D28B5AD1D00860F91 /* Frameworks */,
+				2F5A09CD2BC2ADF9007571C7 /* HelloRust.app */,
+				2F5A09CE2BC2ADF9007571C7 /* HelloRustTests.xctest */,
+				2F5A09CF2BC2ADF9007571C7 /* HelloRustUITests.xctest */,
 			);
 			sourceTree = "<group>";
 		};
@@ -127,7 +130,7 @@
 			);
 			name = HelloRust;
 			productName = HelloRust;
-			productReference = 5761544028B5AB1400860F91 /* HelloRust.app */;
+			productReference = 2F5A09CD2BC2ADF9007571C7 /* HelloRust.app */;
 			productType = "com.apple.product-type.application";
 		};
 		5761544F28B5AB1500860F91 /* HelloRustTests */ = {
@@ -145,7 +148,7 @@
 			);
 			name = HelloRustTests;
 			productName = HelloRustTests;
-			productReference = 5761545028B5AB1500860F91 /* HelloRustTests.xctest */;
+			productReference = 2F5A09CE2BC2ADF9007571C7 /* HelloRustTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		5761545928B5AB1500860F91 /* HelloRustUITests */ = {
@@ -163,7 +166,7 @@
 			);
 			name = HelloRustUITests;
 			productName = HelloRustUITests;
-			productReference = 5761545A28B5AB1500860F91 /* HelloRustUITests.xctest */;
+			productReference = 2F5A09CF2BC2ADF9007571C7 /* HelloRustUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -398,7 +401,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"HelloRust/Preview Content\"";
-				DEVELOPMENT_TEAM = 8VGKADU7QA;
+				DEVELOPMENT_TEAM = QG2XXU4LA3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -412,7 +415,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/../../hellorust/src/nativeInterop/cinterop/hellorust/";
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.seiko.HelloRust;
+				PRODUCT_BUNDLE_IDENTIFIER = com.uoocuniversity.wemeet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/HelloRust/HelloRust-Bridging-Header.h";
@@ -429,7 +432,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"HelloRust/Preview Content\"";
-				DEVELOPMENT_TEAM = 8VGKADU7QA;
+				DEVELOPMENT_TEAM = QG2XXU4LA3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -443,7 +446,7 @@
 				);
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/../../hellorust/src/nativeInterop/cinterop/hellorust/";
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.seiko.HelloRust;
+				PRODUCT_BUNDLE_IDENTIFIER = com.uoocuniversity.wemeet;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "$(PROJECT_DIR)/HelloRust/HelloRust-Bridging-Header.h";

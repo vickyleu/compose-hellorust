@@ -1,4 +1,6 @@
-import org.jetbrains.compose.compose
+@file:Suppress("OPT_IN_USAGE")
+
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     kotlin("multiplatform")
@@ -6,53 +8,62 @@ plugins {
     id("com.android.library")
 }
 
+task("testClasses") {
+    //https://github.com/robolectric/robolectric/issues/1802#issuecomment-137401530
+}
+
+
 kotlin {
-    android()
+    androidTarget()
     jvm("desktop") {
-        compilations.all {
-            kotlinOptions.jvmTarget = Versions.Java.jvmTarget
-        }
+//        compilerOptions {
+//            jvmTarget.set(JvmTarget.fromTarget(libs.versions.jvmTarget.get()))
+//        }
     }
-    ios()
+
+    applyDefaultHierarchyTemplate()
+    listOf(iosArm64(), iosX64(), iosSimulatorArm64())
     macosX64()
     macosArm64()
     sourceSets {
-        val commonMain by getting {
+        commonMain{
             dependencies {
                 api(projects.hellorust)
                 api(compose.ui)
                 api(compose.foundation)
                 api(compose.material)
                 api(compose.runtime)
-                api("io.github.aakira:napier:${Versions.napier}")
-                api("dev.icerock.moko:resources:${Versions.multiplatformResources}")
+                api("io.github.aakira:napier:2.6.1")
+                api("dev.icerock.moko:resources:0.20.1")
             }
         }
-        val androidMain by getting
         val desktopMain by getting
-        val iosMain by getting
-        val macosMain by creating {
-            dependsOn(commonMain)
+        androidMain{
+            dependsOn(commonMain.get())
+        }
+        iosMain{
+            dependsOn(commonMain.get())
+        }
+        macosMain{
+            dependsOn(commonMain.get())
         }
         val macosX64Main by getting {
-            dependsOn(macosMain)
+            dependsOn(macosMain.get())
         }
         val macosArm64Main by getting {
-            dependsOn(macosMain)
+            dependsOn(macosMain.get())
         }
     }
 }
 
 android {
     namespace = "com.seiko.compose.hellorust.demo"
-    compileSdk = Versions.Android.compile
-    buildToolsVersion = Versions.Android.buildTools
+    compileSdk = 34
     defaultConfig {
-        minSdk = Versions.Android.min
-        targetSdk = Versions.Android.target
+        minSdk = 24
     }
     compileOptions {
-        sourceCompatibility = Versions.Java.java
-        targetCompatibility = Versions.Java.java
+        sourceCompatibility = JavaVersion.toVersion(libs.versions.jvmTarget.get())
+        targetCompatibility = JavaVersion.toVersion(libs.versions.jvmTarget.get())
     }
 }

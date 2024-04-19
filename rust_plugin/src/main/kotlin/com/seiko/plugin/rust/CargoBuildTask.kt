@@ -59,7 +59,7 @@ open class CargoBuildTask : DefaultTask() {
             toolchain = toolchain,
             cargoExtension = cargoExtension,
             target = target,
-            intoDir = File(getDir(cargoExtension.jvmJniDir), target.split('-').first()),
+            intoDir = File(getDir(cargoExtension.jvmJniDir), target.first.split('-').first()),
         )
     }
 
@@ -77,7 +77,10 @@ open class CargoBuildTask : DefaultTask() {
             toolchain = toolchain,
             cargoExtension = cargoExtension,
             target = target,
-            intoDir = File(getDir(cargoExtension.cinteropDir), cargoExtension.libName),
+            intoDir = File(
+                getDir(cargoExtension.cinteropDir),
+                "${cargoExtension.libName}/${target.second}"
+            ),
         )
     }
 
@@ -95,18 +98,21 @@ open class CargoBuildTask : DefaultTask() {
             toolchain = toolchain,
             cargoExtension = cargoExtension,
             target = target,
-            intoDir = File(getDir(cargoExtension.cinteropDir), cargoExtension.libName),
+            intoDir = File(
+                getDir(cargoExtension.cinteropDir),
+                "${cargoExtension.libName}/${target.second}"
+            ),
         )
     }
 
     private fun Project.execMoveLib(
         toolchain: Toolchain,
         cargoExtension: CargoExtension,
-        target: String,
+        target: Pair<String, String>,
         intoDir: File,
     ) {
         val moduleDir = getModuleDir(toolchain, cargoExtension)
-        val fromDir = File(moduleDir, "target/$target/${cargoExtension.profile}")
+        val fromDir = File(moduleDir, "target/${target.first}/${cargoExtension.profile}")
         delete {
             delete(intoDir)
         }
@@ -131,7 +137,7 @@ open class CargoBuildTask : DefaultTask() {
                 add(cargoExtension.rustUpCommand)
                 add("target")
                 add("add")
-                addAll(toolchain.targets)
+                addAll(toolchain.targets.map { it.first })
             }
         }
     }
@@ -139,7 +145,7 @@ open class CargoBuildTask : DefaultTask() {
     private fun Project.execRustBuild(
         toolchain: Toolchain,
         cargoExtension: CargoExtension,
-        target: String,
+        target: Pair<String, String>,
     ) {
         exec {
             workingDir = getModuleDir(toolchain, cargoExtension)
@@ -147,7 +153,7 @@ open class CargoBuildTask : DefaultTask() {
                 add(cargoExtension.cargoCommand)
                 add("build")
                 add("--target")
-                add(target)
+                add(target.first)
                 addCommonArgs(cargoExtension)
             }
         }

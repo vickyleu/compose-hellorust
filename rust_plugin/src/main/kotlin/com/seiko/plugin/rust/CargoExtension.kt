@@ -4,7 +4,8 @@ open class CargoExtension {
     var module: String = ""
     var libName: String = ""
     var profile: String = "debug"
-    var isVerbose: Boolean = false
+    var isVerbose: Boolean = true
+//    var isVerbose: Boolean = false
 
     var jniSuffix: String = "-jni"
     var nativeSuffix: String = "-native"

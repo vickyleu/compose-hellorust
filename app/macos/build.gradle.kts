@@ -3,7 +3,12 @@ plugins {
     id("org.jetbrains.compose")
 }
 
+task("testClasses") {
+    //https://github.com/robolectric/robolectric/issues/1802#issuecomment-137401530
+}
+
 kotlin {
+    applyDefaultHierarchyTemplate()
     macosX64 {
         binaries {
             executable {
@@ -32,16 +37,17 @@ kotlin {
     }
 
     sourceSets {
-        val macosMain by creating {
+        macosMain{
+            dependsOn(commonMain.get())
             dependencies {
                 implementation(projects.app.common)
             }
         }
         val macosX64Main by getting {
-            dependsOn(macosMain)
+            dependsOn(macosMain.get())
         }
         val macosArm64Main by getting {
-            dependsOn(macosMain)
+            dependsOn(macosMain.get())
         }
     }
 }

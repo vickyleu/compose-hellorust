@@ -8,15 +8,16 @@ import org.gradle.configurationcache.extensions.capitalized
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.getting
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinMultiplatformPlugin
+import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 
+@Suppress("Unused")
 class RustKotlinPlugin : Plugin<Project> {
     override fun apply(target: Project) {
         with(target) {
             val cargoExtension = extensions.create("cargo", CargoExtension::class.java)
             afterEvaluate {
-                if (plugins.hasPlugin(KotlinMultiplatformPlugin::class.java)) {
-                    throw GradleException("Kotlin multiplatform plugin is not resolved.")
+                if (!project.pluginManager.hasPlugin("org.jetbrains.kotlin.multiplatform")) {
+                    throw GradleException("Completing a library with a multiplatform library requires Kotlin Multiplatform")
                 }
                 val kmpExtension = extensions.getByType(KotlinMultiplatformExtension::class.java)
                 configurePlugin(
@@ -35,9 +36,9 @@ class RustKotlinPlugin : Plugin<Project> {
         check(cargoExtension.libName.isNotEmpty()) { "libName cannot be empty" }
 
         val toolchains = mutableSetOf<Toolchain>()
-        kmpExtension.targets.forEach {
-            val name = it.targetName.capitalized()
-            when (it.targetName) {
+        kmpExtension.targets.forEach { target: KotlinTarget ->
+            val name = target.targetName.capitalized()
+            when (target.targetName) {
                 "android" -> {
                     val androidExtension = extensions.getByType(LibraryExtension::class.java)
                     val abiFilters = androidExtension.defaultConfig.ndk.abiFilters
@@ -50,55 +51,61 @@ class RustKotlinPlugin : Plugin<Project> {
                             name = name,
                             targets = abiFilters.mapTo(mutableSetOf()) { abi ->
                                 when (abi) {
-                                    "x86" -> "i686-linux-android"
-                                    "x86_64" -> "x86_64-linux-android"
-                                    "armeabi-v7a" -> "armv7-linux-androideabi"
-                                    "arm64-v8a" -> "aarch64-linux-android"
-                                    else -> ""
+                                    "x86" -> "i686-linux-android" to target.targetName
+                                    "x86_64" -> "x86_64-linux-android" to target.targetName
+                                    "armeabi-v7a" -> "armv7-linux-androideabi" to target.targetName
+                                    "arm64-v8a" -> "aarch64-linux-android" to target.targetName
+                                    else -> "" to target.targetName
                                 }
                             },
                             abiFilters = abiFilters,
                         )
                     )
                 }
+
                 "jvm", "desktop" -> {
                     toolchains.add(
                         Toolchain.Jvm(
                             name = name,
                             targets = setOf(
-                                getCurrentOsTargetTriple(),
+                                getCurrentOsTargetTriple() to target.targetName,
                             ),
                         )
                     )
                 }
+
                 "macosX64", "macosArm64" -> {
                     toolchains.add(
                         Toolchain.Darwin(
                             name = name,
                             targets = setOf(
-                                when (it.targetName) {
-                                    "macosX64" ->  "x86_64-apple-darwin"
-                                    "macosArm64" -> "aarch64-apple-darwin"
-                                    else -> ""
+                                when (target.targetName) {
+                                    "macosX64" -> "x86_64-apple-darwin" to target.targetName
+                                    "macosArm64" -> "aarch64-apple-darwin" to target.targetName
+                                    else -> "" to target.targetName
                                 }
                             ),
                         )
                     )
                 }
+
                 "iosX64", "iosArm64", "iosSimulatorArm64" -> {
                     toolchains.add(
                         Toolchain.IOS(
                             name = name,
                             targets = setOf(
-                                when (it.targetName) {
-                                    "iosX64" -> "x86_64-apple-ios"
-                                    "iosArm64" -> "aarch64-apple-ios"
-                                    "iosSimulatorArm64" -> "aarch64-apple-ios-sim"
-                                    else -> ""
+                                when (target.targetName) {
+                                    "iosX64" -> "x86_64-apple-ios" to target.targetName
+                                    "iosArm64" -> "aarch64-apple-ios" to target.targetName
+                                    "iosSimulatorArm64" -> "aarch64-apple-ios-sim" to target.targetName
+                                    else -> "" to target.targetName
                                 }
                             ),
                         )
                     )
+                }
+
+                else -> {
                 }
             }
         }
@@ -119,6 +126,7 @@ class RustKotlinPlugin : Plugin<Project> {
                     val javaPreCompileRelease by tasks.getting
                     javaPreCompileRelease.dependsOn(targetBuildTask)
                 }
+
                 is Toolchain.Jvm, is Toolchain.Darwin, is Toolchain.IOS -> {
                     val task = tasks.getByName("compileKotlin${toolchain.name}")
                     task.dependsOn(targetBuildTask)

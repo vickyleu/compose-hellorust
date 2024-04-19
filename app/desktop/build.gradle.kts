@@ -1,17 +1,23 @@
-import org.jetbrains.compose.compose
+@file:Suppress("OPT_IN_USAGE")
+
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
 }
 
+task("testClasses") {
+    //https://github.com/robolectric/robolectric/issues/1802#issuecomment-137401530
+}
+
 kotlin {
     jvm {
-        compilations.all {
-            kotlinOptions.jvmTarget = Versions.Java.jvmTarget
-        }
-        withJava()
+//        compilerOptions {
+//            jvmTarget.set(JvmTarget.fromTarget(libs.versions.jvmTarget.get()))
+//        }
+//        withJava()
     }
     sourceSets {
         val jvmMain by getting {

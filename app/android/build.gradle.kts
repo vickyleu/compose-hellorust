@@ -4,13 +4,17 @@ plugins {
     id("org.jetbrains.compose")
 }
 
+task("testClasses") {
+    //https://github.com/robolectric/robolectric/issues/1802#issuecomment-137401530
+}
+
+
 android {
-    compileSdk = Versions.Android.compile
-    buildToolsVersion = Versions.Android.buildTools
+    compileSdk = 34
+    namespace = "com.seiko.compose.hellorust.demo"
     defaultConfig {
         applicationId = "com.seiko.compose.hellorust.demo"
-        minSdk = Versions.Android.min
-        targetSdk = Versions.Android.target
+        minSdk = 24
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -26,16 +30,16 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = Versions.Java.java
-        targetCompatibility = Versions.Java.java
+        sourceCompatibility = JavaVersion.toVersion(libs.versions.jvmTarget.get())
+        targetCompatibility = JavaVersion.toVersion(libs.versions.jvmTarget.get())
     }
 }
 
 dependencies {
     implementation(projects.app.common)
-    implementation("androidx.activity:activity-compose:1.5.1")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")
+    implementation("androidx.activity:activity-compose:1.8.2")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.3")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 }

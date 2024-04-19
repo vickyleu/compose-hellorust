@@ -1,17 +1,7 @@
 @file:Suppress("UnstableApiUsage")
-
-rootProject.name = "compose-hellorust"
+rootProject.name = "rust_plugin"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
-include(
-    ":app:common",
-    ":app:android",
-    ":app:desktop",
-    ":app:ios",
-    ":app:macos"
-)
-include(":hellorust")
-includeBuild("rust_plugin")
 
 pluginManagement {
     listOf(repositories, dependencyResolutionManagement.repositories).forEach {
@@ -34,11 +24,7 @@ dependencyResolutionManagement {
 //    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
     repositories {
-        mavenCentral {
-            content {
-                excludeGroupByRegex(".*com.android.tools.*")
-            }
-        }
+        mavenCentral()
         google {
             content {
                 includeGroupByRegex(".*google.*")
@@ -46,24 +32,20 @@ dependencyResolutionManagement {
             }
         }
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-        maven {
-            setUrl("https://dl.bintray.com/kotlin/kotlin-dev")
-            content {
-                excludeGroupByRegex(".*com.android.tools.*")
-            }
-        }
-        maven {
-            setUrl("https://dl.bintray.com/kotlin/kotlin-eap")
-            content {
-                excludeGroupByRegex(".*com.android.tools.*")
-            }
-        }
+        maven { setUrl("https://dl.bintray.com/kotlin/kotlin-dev") }
+        maven { setUrl("https://dl.bintray.com/kotlin/kotlin-eap") }
         maven {
             setUrl("https://jitpack.io")
             content {
                 includeGroupByRegex("com.github.*")
-                excludeGroupByRegex(".*com.android.tools.*")
             }
         }
     }
+    versionCatalogs {
+        create("libs") {
+            from(files("../gradle/libs.versions.toml"))
+        }
+    }
 }
+
+

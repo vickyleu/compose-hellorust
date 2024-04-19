@@ -1,80 +1,125 @@
-import org.jetbrains.compose.compose
+@file:Suppress("OPT_IN_USAGE")
+
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
-    kotlin("multiplatform")
-    id("org.jetbrains.compose")
-    id("com.android.library")
-    id("com.seiko.plugin.rust")
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.jetbrains.compose)
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.rust)
 }
 
+task("testClasses") {
+    //https://github.com/robolectric/robolectric/issues/1802#issuecomment-137401530
+}
+
+
 kotlin {
-    android()
+    androidTarget()
     jvm("desktop") {
-        compilations.all {
-            kotlinOptions.jvmTarget = Versions.Java.jvmTarget
-        }
+//        compilerOptions {
+//            jvmTarget.set(JvmTarget.fromTarget(libs.versions.jvmTarget.get()))
+//        }
     }
-    ios()
-    // iosSimulatorArm64()
+    applyDefaultHierarchyTemplate()
+
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+
     macosX64()
     macosArm64()
+
+
     sourceSets {
-        val commonMain by getting {
-            dependencies {
-                api(compose.foundation)
-                api("io.ktor:ktor-client-core:${Versions.ktor}")
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.Kotlin.coroutines}")
-                api("com.squareup.okio:okio:${Versions.okio}")
-                implementation("io.github.aakira:napier:${Versions.napier}")
+        all {
+            languageSettings.apply {
+                optIn("kotlin.RequiresOptIn")
+                // Required for CPointer etc. since Kotlin 1.9.
+                optIn("kotlinx.cinterop.ExperimentalForeignApi")
             }
         }
+        commonMain{
+            dependencies {
+                api(compose.foundation)
+                api(libs.ktor.client.core)
+                api(libs.kotlinx.coroutines.core)
+                api(libs.okio)
+                implementation(libs.napier)
+            }
+        }
+
         val engineMain by creating {
-            dependsOn(commonMain)
+            dependsOn(commonMain.get())
         }
         val jniMain by creating {
             dependsOn(engineMain)
         }
-        val androidMain by getting {
+        androidMain{
             dependsOn(jniMain)
             dependencies {
-                implementation("io.ktor:ktor-client-okhttp:${Versions.ktor}")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.Kotlin.coroutines}")
+                implementation(libs.ktor.client.okhttp)
+                implementation(libs.kotlinx.coroutines.android)
             }
         }
+
         val desktopMain by getting {
             dependsOn(jniMain)
             dependencies {
-                implementation("io.ktor:ktor-client-okhttp:${Versions.ktor}")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:${Versions.Kotlin.coroutines}")
+                implementation(libs.ktor.client.okhttp)
+                implementation(libs.kotlinx.coroutines.swing)
             }
-        }
-        val nativeMain by creating {
-            dependsOn(engineMain)
-        }
-        val iosMain by getting {
-            dependsOn(nativeMain)
-            dependencies {
-                implementation("io.ktor:ktor-client-darwin:${Versions.ktor}")
-            }
-        }
-        val macosMain by creating {
-            dependsOn(nativeMain)
-        }
-        val macosX64Main by getting {
-            dependsOn(macosMain)
-        }
-        val macosArm64Main by getting {
-            dependsOn(macosMain)
         }
 
+        nativeMain{
+            dependsOn(engineMain)
+        }
+
+        iosMain{
+            dependsOn(nativeMain.get())
+            dependencies {
+                implementation(libs.ktor.client.ios)
+            }
+        }
+        val iosX64Main by getting {
+            dependsOn(iosMain.get())
+        }
+        val iosArm64Main by getting {
+            dependsOn(iosMain.get())
+        }
+        val iosSimulatorArm64Main by getting {
+            dependsOn(iosMain.get())
+        }
+
+        macosMain{
+            dependsOn(nativeMain.get())
+        }
+        val macosX64Main by getting {
+            dependsOn(macosMain.get())
+        }
+        val macosArm64Main by getting {
+            dependsOn(macosMain.get())
+        }
         targets.withType<KotlinNativeTarget> {
+            val targetName = this.name
+//            binaries {
+//                sharedLib {
+//                    baseName = "kmmRust"
+////                    linkerOpts("-L${file("src/nativeInterop/cinterop/hellorust/$targetName/").absolutePath}")
+//                }
+//            }
             val main by compilations.getting {
                 cinterops {
                     val hellorust by creating {
-                        defFile("src/nativeInterop/cinterop/hellorust.def")
-                        header("rs/hellorust-native/hellorust.h")
-                        extraOpts("-libraryPath", "$projectDir/src/nativeInterop/cinterop/hellorust")
+
+                        defFile(file("src/nativeInterop/cinterop/hellorust.def"))
+                        header(file("rs/hellorust-native/hellorust.h"))
+                        this.packageName = "hellorust"
+//                        this.linkerOpts("-L${file("src/nativeInterop/cinterop/hellorust/$targetName/").absolutePath}")
+                        extraOpts(
+                            "-libraryPath",file("src/nativeInterop/cinterop/hellorust/$targetName/").absolutePath
+                        )
                     }
                 }
             }
@@ -84,18 +129,21 @@ kotlin {
 
 android {
     namespace = "io.github.qdsfdhvh.compose.hellorust"
-    compileSdk = Versions.Android.compile
-    buildToolsVersion = Versions.Android.buildTools
+    compileSdk = 34
+    ndkVersion = "23.0.7599858"
+
     defaultConfig {
-        minSdk = Versions.Android.min
-        targetSdk = Versions.Android.target
+        minSdk = 24
         ndk {
             abiFilters += listOf("x86", "x86_64", "armeabi-v7a", "arm64-v8a")
         }
     }
+    lint {
+        targetSdk = 34
+    }
     compileOptions {
-        sourceCompatibility = Versions.Java.java
-        targetCompatibility = Versions.Java.java
+        sourceCompatibility = JavaVersion.toVersion(libs.versions.jvmTarget.get())
+        targetCompatibility = JavaVersion.toVersion(libs.versions.jvmTarget.get())
     }
 }
 
@@ -103,6 +151,5 @@ cargo {
     module = "./rs"
     libName = "hellorust"
     profile = "release"
-
     jvmJniDir = "./src/desktopMain/resources/jni"
 }
